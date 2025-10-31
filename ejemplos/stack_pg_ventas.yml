@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  backend:
+    image: titulacionbackend:1
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+    networks:
+      - desarrollo_net
+      - traefik-public
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.backend.entrypoints=http"
+        - "traefik.http.routers.backend.rule=Host(`backend.byronrm.com`)"
+        - "traefik.http.middlewares.backend-https-redirect.redirectscheme.scheme=https"
+        - "traefik.http.routers.backend.middlewares=portainer-https-redirect"
+        - "traefik.http.routers.backend-secure.entrypoints=https"
+        - "traefik.http.routers.backend-secure.rule=Host(`backend.byronrm.com`)"
+        - "traefik.http.routers.backend-secure.tls=true"
+        - "traefik.http.routers.backend-secure.tls.certresolver=http"
+        - "traefik.http.routers.backend-secure.service=backend"
+        - "traefik.http.services.backend.loadbalancer.server.port=8080"
+        - "traefik.docker.network=traefik-public"
+  dbclases:
+    image: postgres:15.0-bullseye
+    environment:
+      - TZ=America/Guayaquil
+      - POSTGRES_DB=titulaciondb
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - pg_tendencia_data:/var/lib/postgresql/data/pgdata
+    networks:
+      - desarrollo_net  
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: bmoreno@uees.edu.ec
+      PGADMIN_DEFAULT_PASSWORD: TuoEsazA4e7L5AyofSgP@
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.pgadmin.entrypoints=http"
+        - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.byronrm.com`)"
+        - "traefik.http.middlewares.pgadmin-https-redirect.redirectscheme.scheme=https"
+        - "traefik.http.routers.pgadmin.middlewares=pgadmin-https-redirect"
+        - "traefik.http.routers.pgadmin-secure.entrypoints=https"
+        - "traefik.http.routers.pgadmin-secure.rule=Host(`pgadmin.byronrm.com`)"
+        - "traefik.http.routers.pgadmin-secure.tls=true"
+        - "traefik.http.routers.pgadmin-secure.tls.certresolver=http"
+        - "traefik.http.routers.pgadmin-secure.service=pgadmin"
+        - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+        - "traefik.docker.network=traefik-public"
+    networks:    
+      - desarrollo_net #Conectarse a la base de datos de postgres
+      - traefik-public
+
+volumes:
+  pg_tendencia_data:
+    external: true
+  pgadmin_data:
+    external: true
+
+networks:
+  desarrollo_net:
+    external: true
+  traefik-public:
+    external: true
