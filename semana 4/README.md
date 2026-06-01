@@ -309,14 +309,14 @@ Bienvenidos a DevOps
 
 | Criterio | Puntos |
 |-----------|---------|
-| Uso correcto de Git | 2 |
-| Aplicación Python funcional | 2 |
-| Pruebas automatizadas | 2 |
-| Dockerfile funcional | 2 |
-| GitHub Actions funcional | 4 |
-| Publicación en GHCR | 4 |
-| Documentación del proceso | 4 |
-| **Total** | **20** |
+| Uso correcto de Git | 1 |
+| Aplicación Python funcional | 1 |
+| Pruebas automatizadas | 1 |
+| Dockerfile funcional | 1 |
+| GitHub Actions funcional | 2 |
+| Publicación en GHCR | 2 |
+| Documentación del proceso | 2 |
+| **Total** | **10** |
 
 ---
 
